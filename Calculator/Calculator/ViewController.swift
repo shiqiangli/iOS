@@ -13,23 +13,36 @@ class ViewController: UIViewController {
     @IBOutlet weak var display: UILabel!
     
     var userIsInTheMiddleTypingANumber: Bool = false
+    var dotCount = 0
+    
     @IBAction func appendDigit(sender: UIButton) {
         let digit = sender.currentTitle!
+        if digit == "." {
+            dotCount++
+        }
     
         if userIsInTheMiddleTypingANumber {
-            display.text = display.text! + digit
+            if dotCount > 1 && digit == "." {
+                display.text = display.text!
+            } else {
+                display.text = display.text! + digit
+            }
         } else {
-            display.text = digit
+            if digit == "." { // for type ".1234", display "0.1234"
+                display.text = "0" + digit
+            } else {
+                display.text = digit
+            }
             userIsInTheMiddleTypingANumber = true
         }
-        
     }
         
-//        @IBAction func backSpace() {
-//            if !display.text!.isEmpty {
-//                clear()
-//            }
-//        }
+    @IBAction func backSpace() {
+        if !display.text!.isEmpty {
+            clear()
+        }
+    }
+    
     @IBAction func operate(sender: UIButton) {
         let operation = sender.currentTitle!
         if userIsInTheMiddleTypingANumber {
@@ -41,6 +54,10 @@ class ViewController: UIViewController {
         case "+": performOperation { $0 + $1 }
         case "×": performOperation { $1 - $0 }
         case "√": performOperation { sqrt($0) }
+        case "sin": performOperation { sin($0) }
+        case "cos": performOperation { cos($0) }
+        case "π": displayValue = M_PI
+            enter()
         default:break
         }
     }
@@ -61,6 +78,7 @@ class ViewController: UIViewController {
     
     @IBAction func enter() {
         userIsInTheMiddleTypingANumber = false
+        dotCount = 0
         operandStack.append(displayValue)
         println("operandStack = \(operandStack)")
     }
@@ -80,6 +98,8 @@ class ViewController: UIViewController {
     @IBAction func clear() {
         userIsInTheMiddleTypingANumber = false
         display.text = "0"
+        dotCount = 0
+        operandStack.removeAll(keepCapacity: false)
     }
 }
 
